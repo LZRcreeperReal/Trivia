@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>Trivia Galaxy — Quiz Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&family=Poppins:wght@500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+/* ============ RESET & BASE ============ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font-body);
+  background: radial-gradient(circle at 20% 0%, var(--bg1), var(--bg2) 70%);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.6s ease, color 0.4s ease;
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input { font-family: inherit; }
+h1, h2, h3 { font-family: var(--font-display); }
+
+/* ============ THEME TOKENS ============ */
+:root, [data-theme="cosmic"] {
+  --bg1: #1b1440; --bg2: #0a0a1f;
+  --surface: rgba(255,255,255,0.06);
+  --surface-solid: #191441;
+  --border: rgba(255,255,255,0.14);
+  --primary: #8b7bff; --primary-text: #0a0a1f;
+  --accent: #ffd97a;
+  --text: #f1eefc; --text-dim: #b8b0e0;
+  --correct: #6ee7b7; --incorrect: #ff8a8a;
+  --font-display: 'Baloo 2', sans-serif;
+  --font-body: 'Nunito', sans-serif;
+  --card-style: 2px solid rgba(255,255,255,0.14);
+  --radius: 20px;
+  --glow: 0 0 30px rgba(139,123,255,0.35);
+}
+
+[data-theme="miku"] {
+  --bg1: #0d2b2b; --bg2: #071616;
+  --surface: rgba(57,197,187,0.08);
+  --surface-solid: #0c2626;
+  --border: rgba(57,197,187,0.35);
+  --primary: #39C5BB; --primary-text: #052222;
+  --accent: #ff6fa5;
+  --text: #eafffb; --text-dim: #8fd8d0;
+  --correct: #6ee7b7; --incorrect: #ff6fa5;
+  --font-display: 'Poppins', sans-serif;
+  --font-body: 'Nunito', sans-serif;
+  --card-style: 2px solid rgba(57,197,187,0.4);
+  --radius: 18px;
+  --glow: 0 0 30px rgba(57,197,187,0.45);
+}
+
+[data-theme="retro"] {
+  --bg1: #1a0033; --bg2: #05000f;
+  --surface: rgba(255,46,136,0.07);
+  --surface-solid: #150029;
+  --border: rgba(0,240,255,0.4);
+  --primary: #ff2e88; --primary-text: #0a0a1f;
+  --accent: #00f0ff;
+  --text: #f5f0ff; --text-dim: #b9a8d8;
+  --correct: #00f0ff; --incorrect: #ff2e88;
+  --font-display: 'Press Start 2P', monospace;
+  --font-body: 'Nunito', sans-serif;
+  --card-style: 3px dashed rgba(0,240,255,0.5);
+  --radius: 8px;
+  --glow: 0 0 25px rgba(0,240,255,0.4);
+}
+
+[data-theme="forest"] {
+  --bg1: #1b4332; --bg2: #0c1f17;
+  --surface: rgba(116,198,157,0.08);
+  --surface-solid: #12291f;
+  --border: rgba(116,198,157,0.35);
+  --primary: #74c69d; --primary-text: #0c1f17;
+  --accent: #ffd60a;
+  --text: #eafff0; --text-dim: #a9d4bd;
+  --correct: #74c69d; --incorrect: #ff8a6a;
+  --font-display: 'Baloo 2', sans-serif;
+  --font-body: 'Nunito', sans-serif;
+  --card-style: 2px solid rgba(116,198,157,0.4);
+  --radius: 22px;
+  --glow: 0 0 30px rgba(116,198,157,0.3);
+}
+
+[data-theme="candy"] {
+  --bg1: #fff0f6; --bg2: #ffe1f0;
+  --surface: rgba(255,255,255,0.65);
+  --surface-solid: #ffffff;
+  --border: rgba(255,111,165,0.35);
+  --primary: #ff6fa5; --primary-text: #ffffff;
+  --accent: #7c5cff;
+  --text: #4a1942; --text-dim: #8a5f80;
+  --correct: #2dd4a7; --incorrect: #ff5c8a;
+  --font-display: 'Baloo 2', sans-serif;
+  --font-body: 'Nunito', sans-serif;
+  --card-style: 3px solid rgba(255,111,165,0.4);
+  --radius: 26px;
+  --glow: 0 0 25px rgba(255,111,165,0.25);
+}
+
+[data-theme="cyberpunk"] {
+  --bg1: #0d0d0d; --bg2: #000000;
+  --surface: rgba(57,255,20,0.06);
+  --surface-solid: #0a0f0a;
+  --border: rgba(57,255,20,0.35);
+  --primary: #39ff14; --primary-text: #05100a;
+  --accent: #ff006e;
+  --text: #d9ffe6; --text-dim: #7fbf95;
+  --correct: #39ff14; --incorrect: #ff006e;
+  --font-display: 'Press Start 2P', monospace;
+  --font-body: 'Nunito', sans-serif;
+  --card-style: 2px solid rgba(57,255,20,0.4);
+  --radius: 10px;
+  --glow: 0 0 30px rgba(57,255,20,0.35);
+}
+
+[data-theme="ocean"] {
+  --bg1: #013a63; --bg2: #011c30;
+  --surface: rgba(72,202,228,0.08);
+  --surface-solid: #012844;
+  --border: rgba(72,202,228,0.35);
+  --primary: #48cae4; --primary-text: #012030;
+  --accent: #ff9f6f;
+  --text: #e0fbfc; --text-dim: #9fd3de;
+  --correct: #48cae4; --incorrect: #ff9f6f;
+  --font-display: 'Baloo 2', sans-serif;
+  --font-body: 'Nunito', sans-serif;
+  --card-style: 2px solid rgba(72,202,228,0.4);
+  --radius: 24px;
+  --glow: 0 0 30px rgba(72,202,228,0.3);
+}
+
+/* ============ PARTICLES ============ */
+#particles {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.particle {
+  position: absolute; bottom: -10%; color: var(--accent);
+  animation: floatUp linear infinite;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+@keyframes floatUp {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-115vh) rotate(25deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .particle { animation: none; display: none; }
+}
+
+/* ============ LAYOUT ============ */
+.app-shell {
+  position: relative; z-index: 1;
+  max-width: 480px; margin: 0 auto;
+  min-height: 100vh;
+  padding: 18px 18px 40px;
+  display: flex; flex-direction: column;
+}
+.app-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px; gap: 10px;
+}
+.app-title {
+  font-size: 1.35rem; font-weight: 800; letter-spacing: 0.02em;
+  display: flex; align-items: center; gap: 8px;
+}
+.app-title .spark { color: var(--accent); }
+#theme-bar { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.theme-dot {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--surface); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.theme-dot.active { box-shadow: 0 0 0 2px var(--accent), var(--glow); transform: scale(1.12); }
+.theme-dot:active { transform: scale(0.94); }
+
+.screen { display: none; flex: 1; flex-direction: column; }
+.screen.active { display: flex; animation: fadeIn 0.35s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ============ HOME ============ */
+.home-hero { text-align: center; margin: 10px 0 24px; }
+.home-hero h1 {
+  font-size: 1.9rem; line-height: 1.15; margin-bottom: 8px;
+}
+.home-hero p { color: var(--text-dim); font-size: 0.95rem; }
+
+.mode-card {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface); border: var(--card-style); border-radius: var(--radius);
+  padding: 16px; margin-bottom: 14px; text-align: left; width: 100%;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  backdrop-filter: blur(6px);
+}
+.mode-card:active { transform: scale(0.97); }
+.mode-card:hover { box-shadow: var(--glow); }
+.mode-icon {
+  font-size: 1.8rem; width: 52px; height: 52px; flex-shrink: 0;
+  border-radius: 14px; background: var(--primary); color: var(--primary-text);
+  display: flex; align-items: center; justify-content: center;
+}
+.mode-info h3 { font-size: 1.05rem; margin-bottom: 3px; }
+.mode-info p { font-size: 0.83rem; color: var(--text-dim); line-height: 1.3; }
+
+.stat-row { display: flex; gap: 10px; margin-top: 6px; }
+.stat-chip {
+  flex: 1; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 10px; text-align: center;
+}
+.stat-chip .num { font-family: var(--font-display); font-size: 1.2rem; color: var(--accent); }
+.stat-chip .lbl { font-size: 0.72rem; color: var(--text-dim); }
+
+/* ============ SETUP ============ */
+.back-btn { align-self: flex-start; color: var(--text-dim); font-size: 0.9rem; margin-bottom: 10px; }
+.screen-title { font-size: 1.4rem; margin-bottom: 6px; }
+.screen-desc { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 18px; }
+.section-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin: 14px 0 8px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 9px 14px; border-radius: 999px; background: var(--surface);
+  border: 1.5px solid var(--border); font-size: 0.86rem; color: var(--text);
+  transition: all 0.15s ease;
+}
+.chip-active { background: var(--primary); color: var(--primary-text); border-color: var(--primary); font-weight: 700; }
+.btn-start { margin-top: 26px; }
+
+/* ============ BUTTONS ============ */
+.btn-primary {
+  background: var(--primary); color: var(--primary-text);
+  padding: 14px; border-radius: 14px; font-weight: 800; font-size: 1rem;
+  width: 100%; box-shadow: var(--glow);
+  transition: transform 0.12s ease;
+}
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:disabled { opacity: 0.4; box-shadow: none; }
+.btn-secondary {
+  background: var(--surface); color: var(--text); border: 1.5px solid var(--border);
+  padding: 13px; border-radius: 14px; font-weight: 700; font-size: 0.95rem; width: 100%;
+}
+.btn-ghost { color: var(--text-dim); padding: 10px; font-size: 0.88rem; width: 100%; }
+
+/* ============ GAME ============ */
+.game-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.progress-label { font-weight: 700; color: var(--text-dim); font-size: 0.9rem; }
+.quit-btn {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--surface);
+  border: 1px solid var(--border); font-size: 1.1rem; line-height: 1;
+}
+.score-pill {
+  align-self: flex-start; background: var(--accent); color: var(--bg2);
+  font-weight: 800; font-size: 0.8rem; padding: 5px 12px; border-radius: 999px; margin-bottom: 10px;
+}
+.question-card {
+  background: var(--surface); border: var(--card-style); border-radius: var(--radius);
+  padding: 22px 18px; margin-bottom: 16px; backdrop-filter: blur(6px);
+  box-shadow: var(--glow);
+}
+.cat-tag {
+  display: inline-block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--accent); font-weight: 800; margin-bottom: 8px;
+}
+.question-text { font-size: 1.15rem; line-height: 1.4; }
+
+.options-grid { display: flex; flex-direction: column; gap: 10px; }
+.option-btn {
+  display: flex; align-items: center; gap: 12px; text-align: left;
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px;
+  padding: 13px 14px; font-size: 0.95rem; transition: all 0.15s ease;
+}
+.option-btn:active { transform: scale(0.98); }
+.opt-letter {
+  width: 26px; height: 26px; border-radius: 8px; background: var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 800; flex-shrink: 0;
+}
+.option-btn.correct { background: color-mix(in srgb, var(--correct) 25%, var(--surface)); border-color: var(--correct); }
+.option-btn.incorrect { background: color-mix(in srgb, var(--incorrect) 25%, var(--surface)); border-color: var(--incorrect); }
+.option-btn.dim { opacity: 0.5; }
+
+.feedback { margin: 14px 0; font-weight: 700; text-align: center; }
+.correct-text { color: var(--correct); }
+.incorrect-text { color: var(--incorrect); }
+
+/* ============ REVEAL MODE ============ */
+.reveal-option { pointer-events: none; }
+.check { color: var(--correct); font-weight: 800; margin-left: 4px; }
+.reveal-nav { display: flex; gap: 10px; margin-top: 4px; }
+.reveal-nav .btn-secondary { flex: 1; }
+.reveal-nav .btn-primary { flex: 2; }
+
+.scoreboard {
+  margin-top: 22px; background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+}
+.scoreboard-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.scoreboard-head h3 { font-size: 1rem; }
+.scoreboard-controls { display: flex; gap: 6px; }
+.mini-btn {
+  background: var(--surface-solid); border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px 9px; font-size: 0.72rem; color: var(--text-dim); font-weight: 700;
+}
+.players-list { display: flex; flex-direction: column; gap: 8px; }
+.player-row { display: flex; align-items: center; gap: 8px; }
+.player-name {
+  flex: 1; background: var(--surface-solid); border: 1px solid var(--border); color: var(--text);
+  border-radius: 10px; padding: 8px 10px; font-size: 0.88rem; min-width: 0;
+}
+.pts-btn {
+  width: 30px; height: 30px; border-radius: 8px; background: var(--surface-solid);
+  border: 1px solid var(--border); font-weight: 800; font-size: 1rem; flex-shrink: 0;
+}
+.pts-btn.plus { color: var(--correct); }
+.pts-btn.minus { color: var(--incorrect); }
+.pts-value { min-width: 22px; text-align: center; font-weight: 800; font-family: var(--font-display); }
+
+/* ============ RESULTS ============ */
+#screen-results { align-items: center; text-align: center; justify-content: center; flex: 1; }
+.results-score { font-family: var(--font-display); font-size: 3rem; margin: 14px 0 4px; color: var(--accent); }
+.results-pct { color: var(--text-dim); margin-bottom: 6px; font-size: 0.95rem; }
+.results-msg { margin-bottom: 26px; font-size: 1rem; }
+.results-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+
+/* ============ RETRO / CYBERPUNK EXTRAS ============ */
+[data-theme="retro"] .question-text, [data-theme="cyberpunk"] .question-text { line-height: 1.55; }
+[data-theme="retro"] .app-title, [data-theme="cyberpunk"] .app-title { font-size: 1rem; letter-spacing: 0; }
+[data-theme="retro"] .screen-title, [data-theme="cyberpunk"] .screen-title { font-size: 1.05rem; }
+[data-theme="retro"] .results-score, [data-theme="cyberpunk"] .results-score { font-size: 2.1rem; }
+
+/* ============ RESPONSIVE ============ */
+@media (min-width: 620px) {
+  .app-shell { max-width: 560px; }
+}
+
+</style>
+</head>
+<body>
+<div id="particles"></div>
+<div class="app-shell">
+
+  <header class="app-header">
+    <div class="app-title"><span class="spark">✦</span> Trivia Galaxy</div>
+    <div id="theme-bar"></div>
+  </header>
+
+  <!-- HOME -->
+  <section class="screen active" id="screen-home">
+    <div class="home-hero">
+      <h1>Pick a mode. Pick a planet. Start playing.</h1>
+      <p>300+ questions across every grade level, plus a galaxy of fun trivia.</p>
+    </div>
+
+    <button class="mode-card" data-mode="classic">
+      <div class="mode-icon">📝</div>
+      <div class="mode-info">
+        <h3>Classic Quiz</h3>
+        <p>Pick a grade + category, answer a round, see your score.</p>
+      </div>
+    </button>
+
+    <button class="mode-card" data-mode="streak">
+      <div class="mode-icon">🔥</div>
+      <div class="mode-info">
+        <h3>Streak Challenge</h3>
+        <p>How many can you get right in a row before one stumps you?</p>
+      </div>
+    </button>
+
+    <button class="mode-card" data-mode="reveal">
+      <div class="mode-icon">🎙️</div>
+      <div class="mode-info">
+        <h3>Reveal &amp; Guess</h3>
+        <p>Host mode for groups — read it aloud, reveal the answer, track scores.</p>
+      </div>
+    </button>
+  </section>
+
+  <!-- SETUP -->
+  <section class="screen" id="screen-setup"></section>
+
+  <!-- GAME (classic + streak) -->
+  <section class="screen" id="screen-game"></section>
+
+  <!-- REVEAL MODE -->
+  <section class="screen" id="screen-reveal"></section>
+
+  <!-- RESULTS -->
+  <section class="screen" id="screen-results"></section>
+
+</div>
+
+<script>
+// ===== THEMES =====
+const THEMES = [
+  { id: 'cosmic',    name: 'Cosmic Moonlight', icon: '🌙', glyphs: ['✦','✧','☆','🌙','⭐','✵'] },
+  { id: 'miku',      name: 'Miku Pop',         icon: '🎤', glyphs: ['♪','♫','✦','💎','✧'] },
+  { id: 'retro',     name: 'Retro Arcade',     icon: '👾', glyphs: ['▮','▯','◆','●','◈'] },
+  { id: 'forest',    name: 'Enchanted Forest', icon: '🍃', glyphs: ['🍃','✨','🌿','🍄'] },
+  { id: 'candy',     name: 'Candy Land',       icon: '🍬', glyphs: ['🍬','🍭','🍡','✨'] },
+  { id: 'cyberpunk', name: 'Cyberpunk Neon',   icon: '⚡', glyphs: ['▮','◆','⬢','✦'] },
+  { id: 'ocean',     name: 'Deep Ocean',       icon: '🌊', glyphs: ['🫧','〜','✦','🐚'] },
+];
+
+// ===== QUESTIONS =====
+// Format per question: [ questionText, [option0,option1,option2,option3], correctIndex ]
+const RAW_QUESTIONS = {
+  k2: {
+    label: 'Grades K\u20132',
+    short: 'K\u20132',
+    categories: {
+      'Math': [
+        ['What is 2 + 2?', ['3','4','5','6'], 1],
+        ['What is 5 - 2?', ['2','3','4','1'], 1],
+        ['How many sides does a triangle have?', ['2','3','4','5'], 1],
+        ['What number comes after 9?', ['8','10','11','7'], 1],
+        ['What is 3 + 4?', ['6','7','8','9'], 1],
+        ['How many days are in a week?', ['5','6','7','8'], 2],
+        ['What shape has 4 equal sides?', ['Circle','Triangle','Square','Star'], 2],
+        ['What is 10 - 4?', ['5','6','7','4'], 1],
+        ['How many months are in a year?', ['10','11','12','13'], 2],
+        ['What is 1 + 1?', ['1','2','3','4'], 1],
+      ],
+      'Science': [
+        ['What do plants need to grow?', ['Candy','Sunlight and water','Rocks','Ice'], 1],
+        ['Which animal says "moo"?', ['Dog','Cat','Cow','Duck'], 2],
+        ['What do we call frozen water?', ['Steam','Ice','Rain','Fire'], 1],
+        ['How many legs does a spider have?', ['6','8','4','10'], 1],
+        ['What is the closest star to Earth?', ['Moon','Sun','Mars','North Star'], 1],
+        ['Which season comes right after winter?', ['Summer','Fall','Spring','Autumn'], 2],
+        ['What do bees make?', ['Milk','Honey','Butter','Juice'], 1],
+        ['What body part do you use to see?', ['Ears','Nose','Eyes','Hands'], 2],
+        ['Which animal is known as "man\u2019s best friend"?', ['Cat','Dog','Bird','Fish'], 1],
+        ['What do caterpillars turn into?', ['Bees','Birds','Butterflies','Frogs'], 2],
+      ],
+      'Animals': [
+        ['What is the largest land animal?', ['Lion','Elephant','Giraffe','Horse'], 1],
+        ['What sound does a cat make?', ['Bark','Moo','Meow','Quack'], 2],
+        ['Which bird cannot fly but is a great swimmer?', ['Eagle','Penguin','Parrot','Owl'], 1],
+        ['What do we call a baby dog?', ['Kitten','Puppy','Cub','Calf'], 1],
+        ['Which animal has a long trunk?', ['Elephant','Zebra','Lion','Bear'], 0],
+        ['What is the tallest animal in the world?', ['Elephant','Giraffe','Horse','Camel'], 1],
+        ['Which animal loves climbing trees and eating bananas?', ['Monkey','Fish','Snake','Rabbit'], 0],
+        ['What do we call a group of wolves?', ['Herd','Pack','Flock','School'], 1],
+        ['Which animal has black and white stripes?', ['Tiger','Zebra','Panda','Fox'], 1],
+        ['What is a baby cat called?', ['Puppy','Kitten','Cub','Chick'], 1],
+      ],
+      'Everyday Life': [
+        ['What color do you get mixing blue and yellow?', ['Purple','Green','Orange','Pink'], 1],
+        ['How many colors are in a rainbow?', ['5','6','7','8'], 2],
+        ['What do you use to brush your teeth?', ['Comb','Toothbrush','Spoon','Fork'], 1],
+        ['Which meal do we usually eat in the morning?', ['Lunch','Dinner','Breakfast','Snack'], 2],
+        ['What do you wear on your feet?', ['Hat','Gloves','Shoes','Scarf'], 2],
+        ['What is often the first day of the week on a calendar?', ['Monday','Saturday','Sunday','Friday'], 2],
+        ['What do we call a place where you borrow books?', ['Library','Bakery','Bank','Zoo'], 0],
+        ['What tool do you use to cut paper?', ['Spoon','Scissors','Fork','Hammer'], 1],
+        ['Which of these is a fruit?', ['Carrot','Apple','Potato','Broccoli'], 1],
+        ['What do you use an umbrella for?', ['Sun','Rain','Wind','Fun'], 1],
+      ],
+      'Letters & Words': [
+        ['How many letters are in the English alphabet?', ['24','25','26','27'], 2],
+        ['What is the first letter of the alphabet?', ['A','B','C','Z'], 0],
+        ['Which word means the opposite of "big"?', ['Tall','Small','Wide','Fast'], 1],
+        ['Which word rhymes with "cat"?', ['Dog','Hat','Sun','Cup'], 1],
+        ['Which word means the same as "happy"?', ['Sad','Glad','Mad','Bad'], 1],
+        ['How many vowels are in the English alphabet?', ['4','5','6','7'], 1],
+        ['What is the opposite of "up"?', ['Down','Left','Right','Over'], 0],
+        ['Which of these is a color word?', ['Run','Blue','Jump','Happy'], 1],
+        ['What mark goes at the end of a question?', ['Period','Comma','Question mark','Exclamation point'], 2],
+        ['Which word means more than one dog?', ['Dog','Dogs','Doges','Dogies'], 1],
+      ],
+    },
+  },
+  g35: {
+    label: 'Grades 3\u20135',
+    short: '3\u20135',
+    categories: {
+      'Math': [
+        ['What is 7 x 8?', ['54','56','58','64'], 1],
+        ['What is 144 \u00f7 12?', ['11','12','13','14'], 1],
+        ['What is pi rounded to two decimal places?', ['3.14','3.41','3.12','3.16'], 0],
+        ['What is 25% of 200?', ['25','50','75','100'], 1],
+        ['How many sides does a hexagon have?', ['5','6','7','8'], 1],
+        ['What is 9 squared?', ['72','81','90','99'], 1],
+        ['What is the perimeter of a square with side length 5?', ['10','15','20','25'], 2],
+        ['What is 1/2 + 1/4?', ['1/2','3/4','2/6','1/4'], 1],
+        ['What is 15 x 4?', ['45','50','60','65'], 2],
+        ['Which of these numbers is prime?', ['9','15','17','21'], 2],
+      ],
+      'Science': [
+        ['What planet is known as the Red Planet?', ['Venus','Mars','Jupiter','Saturn'], 1],
+        ['What gas do plants absorb from the air?', ['Oxygen','Carbon dioxide','Nitrogen','Helium'], 1],
+        ['What is the process plants use to make food called?', ['Respiration','Photosynthesis','Digestion','Evaporation'], 1],
+        ['About how many bones are in the adult human body?', ['186','206','226','246'], 1],
+        ['What is the hardest natural substance on Earth?', ['Gold','Iron','Diamond','Quartz'], 2],
+        ['Which planet is closest to the sun?', ['Earth','Venus','Mercury','Mars'], 2],
+        ['What force pulls objects toward Earth?', ['Magnetism','Gravity','Friction','Tension'], 1],
+        ['What do we call animals that eat only plants?', ['Carnivores','Herbivores','Omnivores','Predators'], 1],
+        ['What is the boiling point of water in Celsius?', ['90','100','110','120'], 1],
+        ['Which organ pumps blood through the body?', ['Lungs','Brain','Heart','Liver'], 2],
+      ],
+      'Geography': [
+        ['What is the largest continent?', ['Africa','Asia','Europe','Antarctica'], 1],
+        ['What is the longest river in the world?', ['Amazon','Nile','Mississippi','Yangtze'], 1],
+        ['Which ocean is the largest?', ['Atlantic','Indian','Arctic','Pacific'], 3],
+        ['What is the capital of France?', ['Berlin','Madrid','Paris','Rome'], 2],
+        ['Which country is shaped like a boot?', ['Spain','Italy','Greece','Portugal'], 1],
+        ['What is the smallest continent?', ['Australia','Europe','Antarctica','South America'], 0],
+        ['Which is the largest hot desert in the world?', ['Gobi','Sahara','Mojave','Kalahari'], 1],
+        ['What is the capital of Japan?', ['Beijing','Seoul','Tokyo','Bangkok'], 2],
+        ['How many continents are there?', ['5','6','7','8'], 2],
+        ['What is the tallest mountain in the world?', ['K2','Kilimanjaro','Mount Everest','Denali'], 2],
+      ],
+      'History': [
+        ['Who was the first President of the United States?', ['Thomas Jefferson','George Washington','Abraham Lincoln','John Adams'], 1],
+        ['In which country were the pyramids of Giza built?', ['Greece','Mexico','Egypt','Rome'], 2],
+        ['What ship did the Pilgrims sail to America on?', ['Titanic','Mayflower','Santa Maria','Nina'], 1],
+        ['Who is credited with inventing the practical light bulb?', ['Albert Einstein','Isaac Newton','Thomas Edison','Nikola Tesla'], 2],
+        ['What wall divided a German city during the Cold War?', ['Great Wall','Berlin Wall','Hadrian\u2019s Wall','Wailing Wall'], 1],
+        ['Which ancient civilization built the Colosseum?', ['Greek','Egyptian','Roman','Persian'], 2],
+        ['Who is known as the "Father of Our Country" in the US?', ['Benjamin Franklin','George Washington','Thomas Jefferson','Paul Revere'], 1],
+        ['What major war began in 1914?', ['World War I','World War II','The Cold War','The Civil War'], 0],
+        ['Who is traditionally credited with reaching America in 1492?', ['Columbus','Magellan','Cook','Vespucci'], 0],
+        ['What year did the US declare independence?', ['1776','1789','1812','1865'], 0],
+      ],
+      'Language Arts': [
+        ['What is a noun?', ['An action word','A person, place, or thing','A describing word','A connecting word'], 1],
+        ['Which word is a synonym for "happy"?', ['Sad','Joyful','Angry','Tired'], 1],
+        ['What is the plural of "child"?', ['Childs','Childes','Children','Childrens'], 2],
+        ['What punctuation ends an exclamatory sentence?', ['Period','Comma','Question mark','Exclamation point'], 3],
+        ['Which word is an adjective?', ['Run','Quickly','Blue','And'], 2],
+        ['What is the past tense of "go"?', ['Goed','Went','Gone','Going'], 1],
+        ['What do we call a story that is not true?', ['Fiction','Nonfiction','Biography','Autobiography'], 0],
+        ['Which word means the opposite of "ancient"?', ['Old','Modern','Historic','Antique'], 1],
+        ['What is a group of sentences about one topic called?', ['A word','A paragraph','A letter','A title'], 1],
+        ['What part of speech is the word "quickly"?', ['Noun','Verb','Adjective','Adverb'], 3],
+      ],
+    },
+  },
+  g68: {
+    label: 'Grades 6\u20138',
+    short: '6\u20138',
+    categories: {
+      'Math': [
+        ['What is the value of x in 2x + 3 = 11?', ['3','4','5','6'], 1],
+        ['What is the area of a circle with radius 4? (\u03c0\u22483.14)', ['12.56','25.12','50.24','16'], 2],
+        ['What is 8\u00b2 - 6\u00b2?', ['28','20','24','16'], 0],
+        ['What is the square root of 169?', ['11','12','13','14'], 2],
+        ['Simplify: 3(x + 4)', ['3x+4','3x+12','x+12','3x+7'], 1],
+        ['What is the slope of a horizontal line?', ['Undefined','1','0','-1'], 2],
+        ['Convert 3/4 to a percentage.', ['34%','43%','75%','74%'], 2],
+        ['What is the sum of angles in a triangle?', ['90\u00b0','180\u00b0','270\u00b0','360\u00b0'], 1],
+        ['What is 15% of 80?', ['10','12','14','16'], 1],
+        ['What is pi to 4 decimal places?', ['3.1415','3.1416','3.1417','3.1418'], 1],
+      ],
+      'Science': [
+        ['What is the powerhouse of the cell?', ['Nucleus','Mitochondria','Ribosome','Golgi body'], 1],
+        ['What is the chemical symbol for gold?', ['Ag','Au','Gd','Go'], 1],
+        ['What are the three common states of matter?', ['Solid, liquid, gas','Hot, cold, warm','Big, medium, small','Fast, slow, still'], 0],
+        ['What force causes objects to fall toward Earth?', ['Friction','Gravity','Magnetism','Inertia'], 1],
+        ['What is the chemical formula for water?', ['CO2','H2O','O2','NaCl'], 1],
+        ['What type of energy is stored energy called?', ['Kinetic','Potential','Thermal','Nuclear'], 1],
+        ['Which blood cells fight infection?', ['Red blood cells','White blood cells','Platelets','Plasma'], 1],
+        ['What is it called when a liquid turns into a gas?', ['Condensation','Evaporation','Freezing','Melting'], 1],
+        ['Which planet currently has the most known moons?', ['Earth','Mars','Saturn','Mercury'], 2],
+        ['What is the basic unit of life?', ['Atom','Molecule','Cell','Organ'], 2],
+      ],
+      'World History': [
+        ['Which empire was ruled by Julius Caesar?', ['Greek','Roman','Persian','Egyptian'], 1],
+        ['What year did World War II end?', ['1943','1945','1947','1950'], 1],
+        ['Who was the primary author of the Declaration of Independence?', ['Thomas Jefferson','Benjamin Franklin','John Adams','George Washington'], 0],
+        ['Who led the expedition that first circumnavigated the globe?', ['Columbus','Magellan\u2019s expedition','Cook','Drake'], 1],
+        ['Which ancient wonder is located in Egypt?', ['Great Pyramid of Giza','Colossus of Rhodes','Hanging Gardens','Lighthouse of Alexandria'], 0],
+        ['Which country was formerly known as Persia?', ['Iraq','Iran','Turkey','Syria'], 1],
+        ['What was the period of cultural rebirth after the Middle Ages called?', ['Renaissance','Enlightenment','Reformation','Industrial Revolution'], 0],
+        ['Who led Nazi Germany during World War II?', ['Joseph Stalin','Adolf Hitler','Benito Mussolini','Winston Churchill'], 1],
+        ['Which 1215 document limited the English king\u2019s power?', ['Magna Carta','Bill of Rights','Treaty of Versailles','Declaration of Independence'], 0],
+        ['What wall separated East and West Berlin?', ['Great Wall','Berlin Wall','Iron Curtain','Hadrian\u2019s Wall'], 1],
+      ],
+      'Geography': [
+        ['What is the capital of Australia?', ['Sydney','Melbourne','Canberra','Perth'], 2],
+        ['Which country has the largest population in the world today?', ['India','United States','China','Indonesia'], 0],
+        ['What is the longest mountain range in the world?', ['Rocky Mountains','Andes','Himalayas','Alps'], 1],
+        ['Which African country is famous for its ancient pyramids?', ['Egypt','Kenya','Nigeria','Morocco'], 0],
+        ['What is the smallest country in the world?', ['Monaco','Vatican City','San Marino','Liechtenstein'], 1],
+        ['Which U.S. state is known as the "Sunshine State"?', ['California','Texas','Florida','Arizona'], 2],
+        ['What body of water separates the UK from mainland Europe?', ['Atlantic Ocean','North Sea','English Channel','Irish Sea'], 2],
+        ['Which country lies in both Europe and Asia?', ['Turkey','Spain','Germany','Italy'], 0],
+        ['What is the capital of Canada?', ['Toronto','Vancouver','Ottawa','Montreal'], 2],
+        ['Which river flows through Egypt?', ['Amazon','Nile','Congo','Niger'], 1],
+      ],
+      'English & Literature': [
+        ['Who wrote "Romeo and Juliet"?', ['Charles Dickens','William Shakespeare','Mark Twain','Jane Austen'], 1],
+        ['What is a metaphor?', ['A comparison using "like" or "as"','A direct comparison without "like" or "as"','A word that imitates a sound','A repeated consonant sound'], 1],
+        ['What is the main character in a story called?', ['Antagonist','Protagonist','Narrator','Author'], 1],
+        ['Which of these is an example of alliteration?', ['She sells seashells','The wind howled','Time flies','Busy as a bee'], 0],
+        ['What is the term for the time and place a story happens?', ['Plot','Theme','Setting','Climax'], 2],
+        ['Who wrote "Adventures of Huckleberry Finn"?', ['Mark Twain','Ernest Hemingway','F. Scott Fitzgerald','Herman Melville'], 0],
+        ['What do you call the highest point of tension in a story?', ['Exposition','Climax','Resolution','Rising action'], 1],
+        ['What is a simile?', ['A comparison using "like" or "as"','A direct comparison','A type of rhyme','An exaggeration'], 0],
+        ['What is the message or lesson of a story called?', ['Plot','Setting','Theme','Character'], 2],
+        ['Who wrote the Harry Potter series?', ['J.R.R. Tolkien','J.K. Rowling','C.S. Lewis','Roald Dahl'], 1],
+      ],
+    },
+  },
+  g912: {
+    label: 'Grades 9\u201312',
+    short: '9\u201312',
+    categories: {
+      'Math': [
+        ['What is the derivative of x\u00b2?', ['x','2x','x\u00b2','2'], 1],
+        ['The quadratic formula is used to:', ['Find slope','Solve quadratic equations','Find area','Find volume'], 1],
+        ['What is sin(90\u00b0)?', ['0','0.5','1','-1'], 2],
+        ['What is log base 10 of 100?', ['1','2','10','100'], 1],
+        ['What is the sum of interior angles of a pentagon?', ['360\u00b0','450\u00b0','540\u00b0','720\u00b0'], 2],
+        ['What is the formula for the area of a circle?', ['2\u03c0r','\u03c0r\u00b2','\u03c0d','2\u03c0r\u00b2'], 1],
+        ['If f(x) = 2x + 3, what is f(5)?', ['10','11','13','15'], 2],
+        ['What is the value of i\u00b2 in complex numbers?', ['1','-1','i','0'], 1],
+        ['The Pythagorean theorem is used to find:', ['Area of a triangle','A missing side of a right triangle','An angle of a triangle','The perimeter of a square'], 1],
+        ['What is 7 factorial (7!)?', ['720','5040','49','42'], 1],
+      ],
+      'Science': [
+        ['What is the atomic number of hydrogen?', ['0','1','2','3'], 1],
+        ['Who developed the theory of general relativity?', ['Isaac Newton','Albert Einstein','Niels Bohr','Galileo Galilei'], 1],
+        ['Which organelle is central to cellular respiration?', ['Chloroplast','Mitochondria','Ribosome','Nucleus'], 1],
+        ['Newton\u2019s First Law is also known as the Law of:', ['Gravity','Inertia','Action-Reaction','Momentum'], 1],
+        ['Which bond involves atoms sharing electrons?', ['Ionic bond','Covalent bond','Metallic bond','Hydrogen bond'], 1],
+        ['What is the pH of a neutral solution?', ['0','7','14','10'], 1],
+        ['Which particle carries a negative charge?', ['Proton','Neutron','Electron','Photon'], 2],
+        ['Which process converts light energy into chemical energy?', ['Respiration','Photosynthesis','Fermentation','Osmosis'], 1],
+        ['What is the approximate speed of light in a vacuum?', ['3,000 km/s','30,000 km/s','300,000 km/s','3,000,000 km/s'], 2],
+        ['Which law states energy cannot be created or destroyed?', ['Conservation of Mass','Conservation of Energy','Newton\u2019s Third Law','Second Law of Thermodynamics'], 1],
+      ],
+      'US & World History': [
+        ['Who was US President during the Civil War?', ['Abraham Lincoln','Andrew Johnson','Ulysses S. Grant','James Buchanan'], 0],
+        ['What event triggered the start of World War I?', ['The bombing of Pearl Harbor','The assassination of Archduke Franz Ferdinand','The invasion of Poland','The sinking of the Lusitania'], 1],
+        ['What year did the Berlin Wall fall?', ['1987','1989','1991','1993'], 1],
+        ['Which document begins with "We the People"?', ['Declaration of Independence','US Constitution','Bill of Rights','Gettysburg Address'], 1],
+        ['Who was the first person to walk on the moon?', ['Buzz Aldrin','Neil Armstrong','Yuri Gagarin','John Glenn'], 1],
+        ['What was the severe economic crisis that began in 1929 called?', ['The Great Recession','The Great Depression','Black Monday','The Panic of 1929'], 1],
+        ['Which former Soviet republic is Europe\u2019s second-largest country by area?', ['Ukraine','Russia','Kazakhstan','Belarus'], 0],
+        ['What movement did Martin Luther King Jr. lead?', ['Suffrage Movement','Civil Rights Movement','Labor Movement','Abolitionist Movement'], 1],
+        ['Which treaty formally ended World War I?', ['Treaty of Versailles','Treaty of Paris','Treaty of Ghent','Treaty of Tordesillas'], 0],
+        ['Who was British Prime Minister for most of World War II?', ['Neville Chamberlain','Winston Churchill','Margaret Thatcher','Tony Blair'], 1],
+      ],
+      'Geography': [
+        ['What is the capital of Brazil?', ['Rio de Janeiro','Sao Paulo','Brasilia','Salvador'], 2],
+        ['Which mountain range is often cited as the border between Europe and Asia?', ['Alps','Andes','Ural Mountains','Himalayas'], 2],
+        ['What is considered the driest place on Earth?', ['Sahara Desert','Atacama Desert','Gobi Desert','Death Valley'], 1],
+        ['Which country has the most time zones (including territories)?', ['Russia','United States','France','China'], 2],
+        ['What is the largest island in the world?', ['Madagascar','Greenland','Borneo','New Guinea'], 1],
+        ['Which strait separates Asia and North America?', ['Strait of Gibraltar','Bering Strait','Strait of Malacca','Bosphorus'], 1],
+        ['What is the capital of South Korea?', ['Tokyo','Seoul','Beijing','Pyongyang'], 1],
+        ['Which sea is the saltiest large body of water on Earth?', ['Red Sea','Dead Sea','Caspian Sea','Mediterranean Sea'], 1],
+        ['Where is the lowest point on Earth\u2019s land surface?', ['Death Valley','Dead Sea shore','Mariana Trench','Qattara Depression'], 1],
+        ['Which country spans Europe and Asia across the Ural Mountains?', ['Turkey','Russia','Kazakhstan','Georgia'], 1],
+      ],
+      'Literature': [
+        ['Who wrote "Pride and Prejudice"?', ['Charlotte Bronte','Jane Austen','Emily Bronte','Mary Shelley'], 1],
+        ['Who wrote "1984"?', ['Aldous Huxley','George Orwell','Ray Bradbury','H.G. Wells'], 1],
+        ['Which novel begins with "Call me Ishmael"?', ['Moby-Dick','The Great Gatsby','Great Expectations','The Old Man and the Sea'], 0],
+        ['Who wrote "The Great Gatsby"?', ['Ernest Hemingway','F. Scott Fitzgerald','William Faulkner','John Steinbeck'], 1],
+        ['Which Shakespeare play features Hamlet and Ophelia?', ['Macbeth','Othello','Hamlet','King Lear'], 2],
+        ['Who wrote "To Kill a Mockingbird"?', ['Harper Lee','Toni Morrison','Maya Angelou','Alice Walker'], 0],
+        ['What literary term describes giving human traits to non-human things?', ['Personification','Symbolism','Foreshadowing','Irony'], 0],
+        ['Who wrote the epic poem "The Odyssey"?', ['Virgil','Homer','Sophocles','Dante'], 1],
+        ['Which Aldous Huxley novel depicts a futuristic World State?', ['1984','Brave New World','Fahrenheit 451','The Handmaid\u2019s Tale'], 1],
+        ['What literary device hints at events to come?', ['Flashback','Foreshadowing','Symbolism','Satire'], 1],
+      ],
+    },
+  },
+  fun: {
+    label: 'Fun Trivia',
+    short: 'Fun',
+    categories: {
+      'Pop Culture': [
+        ['Which app is known for short videos and a musical-note logo?', ['Instagram','TikTok','Snapchat','Facebook'], 1],
+        ['Which of these is the best-selling video game of all time?', ['Tetris','Minecraft','Grand Theft Auto V','Fortnite'], 1],
+        ['Which tech company\u2019s logo is a fruit with a bite taken out?', ['Samsung','Apple','BlackBerry','Google'], 1],
+        ['A person who collects stamps is called a:', ['Numismatist','Philatelist','Archivist','Curator'], 1],
+        ['Which superhero is known as the "Man of Steel"?', ['Batman','Spider-Man','Superman','Iron Man'], 2],
+        ['What shape is a standard stop sign?', ['Circle','Triangle','Octagon','Square'], 2],
+        ['What does "LOL" commonly stand for?', ['Lots of Love','Laugh Out Loud','Live Out Loud','Laugh On Line'], 1],
+        ['Which company created the iPhone?', ['Samsung','Google','Apple','Microsoft'], 2],
+        ['Which sport has the largest global fan base?', ['Basketball','Cricket','Soccer/Football','Tennis'], 2],
+        ['A word spelled the same forwards and backwards is a:', ['Synonym','Palindrome','Acronym','Homograph'], 1],
+      ],
+      'Movies & TV': [
+        ['In "The Wizard of Oz," what color are Dorothy\u2019s famous shoes?', ['Silver','Ruby red','Blue','Green'], 1],
+        ['Which movie features a great white shark terrorizing a beach town?', ['Jaws','Titanic','The Perfect Storm','Free Willy'], 0],
+        ['What is the name of the young wizard in J.K. Rowling\u2019s series?', ['Ron Weasley','Harry Potter','Neville Longbottom','Draco Malfoy'], 1],
+        ['Which animated film follows a clownfish searching for his son?', ['Finding Nemo','Shark Tale','The Little Mermaid','Moana'], 0],
+        ['Which film became the highest-grossing movie of all time (unadjusted)?', ['Titanic','Avengers: Endgame','Avatar','Star Wars'], 2],
+        ['In "Star Wars," who first mentors Luke Skywalker?', ['Yoda','Obi-Wan Kenobi','Darth Vader','Han Solo'], 1],
+        ['What kind of creature is Shrek?', ['Troll','Ogre','Giant','Goblin'], 1],
+        ['Which show follows a chemistry teacher who starts making meth?', ['Breaking Bad','Better Call Saul','Ozark','Narcos'], 0],
+        ['What is the name of the coffee shop in "Friends"?', ['Central Perk','Java Joe\u2019s','The Grind','Common Grounds'], 0],
+        ['Which Pixar movie takes place inside a girl\u2019s mind, among her emotions?', ['Soul','Inside Out','Up','Coco'], 1],
+      ],
+      'Music': [
+        ['Which artist is known as the "King of Pop"?', ['Elvis Presley','Michael Jackson','Prince','Justin Timberlake'], 1],
+        ['How many strings does a standard guitar have?', ['4','5','6','7'], 2],
+        ['Which instrument typically has 88 keys?', ['Guitar','Piano','Violin','Drum'], 1],
+        ['Which band sang "Bohemian Rhapsody"?', ['The Beatles','Queen','Led Zeppelin','Pink Floyd'], 1],
+        ['A group of singers performing together is called a:', ['Orchestra','Choir','Band','Ensemble'], 1],
+        ['Which pop star sings "Shake It Off" and "Blank Space"?', ['Ariana Grande','Taylor Swift','Katy Perry','Selena Gomez'], 1],
+        ['Which music genre began in Jamaica and is linked to Bob Marley?', ['Jazz','Reggae','Blues','Salsa'], 1],
+        ['Which composer kept composing after losing his hearing?', ['Mozart','Bach','Beethoven','Chopin'], 2],
+        ['What does "DJ" stand for?', ['Dance Jockey','Disc Jockey','Digital Jukebox','Danceable Jams'], 1],
+        ['Which turquoise-haired virtual singer is a famous Vocaloid idol?', ['Rin Kagamine','Hatsune Miku','Luka Megurine','GUMI'], 1],
+      ],
+      'Food': [
+        ['What is the main ingredient in guacamole?', ['Tomato','Avocado','Onion','Lime'], 1],
+        ['Which country is credited with inventing pizza as we know it?', ['France','Italy','Greece','Spain'], 1],
+        ['What kind of dough makes a traditional flaky croissant?', ['Shortcrust','Laminated/puff dough','Sponge cake','Choux'], 1],
+        ['What is sushi traditionally wrapped in?', ['Lettuce','Seaweed (nori)','Rice paper','Grape leaves'], 1],
+        ['Which fruit is famous for "keeping the doctor away"?', ['Orange','Apple','Banana','Grape'], 1],
+        ['What is the main ingredient in traditional hummus?', ['Black beans','Chickpeas','Lentils','Peas'], 1],
+        ['What kind of food is a bagel?', ['Cake','Boiled-then-baked bread','Cookie','Pastry'], 1],
+        ['Which pricey spice comes from the crocus flower?', ['Cinnamon','Saffron','Turmeric','Paprika'], 1],
+        ['Ice cream is traditionally made from cream, sugar, and:', ['Salt','Flavoring','Flour','Vinegar'], 1],
+        ['What is the star ingredient in traditional pesto?', ['Tomatoes','Basil','Garlic','Parmesan'], 1],
+      ],
+      'Random Fun Facts': [
+        ['How many hearts does an octopus have?', ['1','2','3','4'], 2],
+        ['What is the only mammal capable of true flight?', ['Flying squirrel','Bat','Sugar glider','Colugo'], 1],
+        ['A shark\u2019s skeleton is made mostly of:', ['Bone','Cartilage','Muscle','Keratin'], 1],
+        ['What is the fastest land animal in the world?', ['Lion','Cheetah','Horse','Greyhound'], 1],
+        ['How many hours are in two days?', ['24','36','48','50'], 2],
+        ['What is the largest organ in the human body?', ['Heart','Liver','Skin','Brain'], 2],
+        ['Which planet is famous for its bright ring system?', ['Jupiter','Saturn','Uranus','Neptune'], 1],
+        ['What do you call a shape with eight sides?', ['Hexagon','Heptagon','Octagon','Nonagon'], 2],
+        ['Which country gifted the Statue of Liberty to the US?', ['England','France','Spain','Italy'], 1],
+        ['What is the world\u2019s largest ocean?', ['Atlantic','Indian','Arctic','Pacific'], 3],
+      ],
+    },
+  },
+};
+
+</script>
+<script>
+/* ============ STATE ============ */
+const state = {
+  theme: 'cosmic',
+  screen: 'home',       // home | setup | game | reveal | results
+  mode: null,            // classic | streak | reveal
+  gradeKey: null,
+  categoryKey: 'All',
+  roundLength: 10,
+  pool: [],
+  index: 0,
+  score: 0,
+  streak: 0,
+  bestStreak: 0,
+  answered: false,
+  selected: null,
+  revealed: false,
+  players: [
+    { name: 'Player 1', pts: 0 },
+    { name: 'Player 2', pts: 0 },
+  ],
+};
+
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+/* ============ UTIL ============ */
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildQuestionObjects(gradeKey, categoryKey) {
+  const grade = RAW_QUESTIONS[gradeKey];
+  const out = [];
+  for (const cat in grade.categories) {
+    if (categoryKey !== 'All' && cat !== categoryKey) continue;
+    grade.categories[cat].forEach((q, i) => {
+      out.push({
+        id: gradeKey + '-' + cat + '-' + i,
+        category: cat,
+        q: q[0],
+        options: q[1],
+        answer: q[2],
+      });
+    });
+  }
+  return out;
+}
+
+function shuffleQuestionOptions(q) {
+  // shuffle options but keep track of correct answer text
+  const correctText = q.options[q.answer];
+  const opts = shuffle(q.options);
+  return {
+    ...q,
+    options: opts,
+    answer: opts.indexOf(correctText),
+  };
+}
+
+/* ============ PARTICLES ============ */
+let particleTimer = null;
+function renderParticles() {
+  const layer = $('#particles');
+  if (!layer) return;
+  layer.innerHTML = '';
+  const theme = THEMES.find(t => t.id === state.theme);
+  const glyphs = theme.glyphs;
+  const count = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 16;
+  for (let i = 0; i < count; i++) {
+    const span = document.createElement('span');
+    span.className = 'particle';
+    span.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+    const left = Math.random() * 100;
+    const dur = 14 + Math.random() * 16;
+    const delay = Math.random() * -20;
+    const size = 0.7 + Math.random() * 1.3;
+    span.style.left = left + 'vw';
+    span.style.animationDuration = dur + 's';
+    span.style.animationDelay = delay + 's';
+    span.style.fontSize = size + 'rem';
+    span.style.opacity = (0.25 + Math.random() * 0.35).toFixed(2);
+    layer.appendChild(span);
+  }
+}
+
+/* ============ THEME ============ */
+function applyTheme(themeId) {
+  state.theme = themeId;
+  document.documentElement.setAttribute('data-theme', themeId);
+  renderParticles();
+  renderThemeBar();
+  try { window.storage && window.storage.set('trivia:last-theme', themeId); } catch (e) {}
+}
+
+function renderThemeBar() {
+  const bar = $('#theme-bar');
+  if (!bar) return;
+  bar.innerHTML = THEMES.map(t => `
+    <button class="theme-dot ${t.id === state.theme ? 'active' : ''}" data-theme-id="${t.id}" title="${t.name}" aria-label="${t.name} theme">
+      <span>${t.icon}</span>
+    </button>
+  `).join('');
+}
+
+/* ============ NAVIGATION ============ */
+function goHome() {
+  state.screen = 'home';
+  state.mode = null;
+  render();
+}
+
+function openSetup(mode) {
+  state.mode = mode;
+  state.screen = 'setup';
+  state.gradeKey = null;
+  state.categoryKey = 'All';
+  render();
+}
+
+/* ============ GAME START ============ */
+function startGame() {
+  if (!state.gradeKey) return;
+  let pool = buildQuestionObjects(state.gradeKey, state.categoryKey);
+  pool = shuffle(pool).map(shuffleQuestionOptions);
+
+  if (state.mode === 'classic') {
+    state.pool = pool.slice(0, Math.min(state.roundLength, pool.length));
+    state.index = 0;
+    state.score = 0;
+    state.answered = false;
+    state.selected = null;
+    state.screen = 'game';
+  } else if (state.mode === 'streak') {
+    state.pool = pool; // full shuffled pool, will loop/reshuffle if exhausted
+    state.poolCursor = 0;
+    state.index = 0;
+    state.streak = 0;
+    state.answered = false;
+    state.selected = null;
+    state.screen = 'game';
+  } else if (state.mode === 'reveal') {
+    state.pool = pool;
+    state.index = 0;
+    state.revealed = false;
+    state.players = state.players.map(p => ({ ...p, pts: 0 }));
+    state.screen = 'reveal';
+  }
+  render();
+}
+
+async function loadBestStreak() {
+  try {
+    const res = await window.storage.get('trivia:best-streak');
+    if (res && res.value) state.bestStreak = parseInt(res.value, 10) || 0;
+  } catch (e) { /* no stored value yet, or storage unavailable */ }
+}
+
+async function saveBestStreak() {
+  try { await window.storage.set('trivia:best-streak', String(state.bestStreak)); } catch (e) {}
+}
+
+/* ============ ANSWERING (classic + streak) ============ */
+function selectAnswer(i) {
+  if (state.answered) return;
+  state.answered = true;
+  state.selected = i;
+  const q = state.pool[state.index];
+  const correct = i === q.answer;
+
+  if (state.mode === 'classic') {
+    if (correct) state.score++;
+  } else if (state.mode === 'streak') {
+    if (correct) {
+      state.streak++;
+      if (state.streak > state.bestStreak) {
+        state.bestStreak = state.streak;
+        saveBestStreak();
+      }
+    }
+  }
+  render();
+}
+
+function nextQuestion() {
+  if (state.mode === 'classic') {
+    if (state.index + 1 >= state.pool.length) {
+      state.screen = 'results';
+      render();
+      return;
+    }
+    state.index++;
+    state.answered = false;
+    state.selected = null;
+    render();
+  } else if (state.mode === 'streak') {
+    const q = state.pool[state.index];
+    const wasCorrect = state.selected === q.answer;
+    if (!wasCorrect) {
+      state.screen = 'results';
+      render();
+      return;
+    }
+    state.index++;
+    if (state.index >= state.pool.length) {
+      // reshuffle a fresh pool (avoid immediate repeat of last question)
+      let fresh = shuffle(buildQuestionObjects(state.gradeKey, state.categoryKey)).map(shuffleQuestionOptions);
+      state.pool = state.pool.concat(fresh);
+    }
+    state.answered = false;
+    state.selected = null;
+    render();
+  }
+}
+
+function quitToHome() {
+  if (state.mode === 'streak' && state.screen === 'game') {
+    // ending early still counts current streak as final
+  }
+  goHome();
+}
+
+/* ============ REVEAL MODE ============ */
+function revealAnswer() {
+  state.revealed = true;
+  render();
+}
+function revealNext() {
+  if (state.index + 1 >= state.pool.length) {
+    state.index = 0; // loop back around for endless party play
+  } else {
+    state.index++;
+  }
+  state.revealed = false;
+  render();
+}
+function revealPrev() {
+  state.index = state.index === 0 ? state.pool.length - 1 : state.index - 1;
+  state.revealed = false;
+  render();
+}
+function addPlayer() {
+  if (state.players.length >= 6) return;
+  state.players.push({ name: 'Player ' + (state.players.length + 1), pts: 0 });
+  render();
+}
+function removePlayer() {
+  if (state.players.length <= 1) return;
+  state.players.pop();
+  render();
+}
+function bumpScore(i, delta) {
+  state.players[i].pts = Math.max(0, state.players[i].pts + delta);
+  render();
+}
+function renamePlayer(i, name) {
+  state.players[i].name = name;
+}
+function resetScores() {
+  state.players = state.players.map(p => ({ ...p, pts: 0 }));
+  render();
+}
+
+/* ============ RENDER ============ */
+function render() {
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  if (state.screen === 'home') renderHome();
+  else if (state.screen === 'setup') renderSetup();
+  else if (state.screen === 'game') renderGame();
+  else if (state.screen === 'reveal') renderReveal();
+  else if (state.screen === 'results') renderResults();
+}
+
+function renderHome() {
+  const el = $('#screen-home');
+  el.classList.add('active');
+}
+
+function renderSetup() {
+  const el = $('#screen-setup');
+  el.classList.add('active');
+  const modeLabel = { classic: 'Classic Quiz', streak: 'Streak Challenge', reveal: 'Reveal & Guess' }[state.mode];
+  const modeDesc = {
+    classic: 'Answer a set of questions and see your score at the end.',
+    streak: 'Keep going as long as you answer right. One miss ends the run!',
+    reveal: 'Read questions out loud, reveal the answer, and track who got it right.',
+  }[state.mode];
+
+  const grades = Object.keys(RAW_QUESTIONS);
+  const gradeChips = grades.map(g => `
+    <button class="chip ${state.gradeKey === g ? 'chip-active' : ''}" data-grade="${g}">${RAW_QUESTIONS[g].label}</button>
+  `).join('');
+
+  let categoryChips = '';
+  if (state.gradeKey) {
+    const cats = ['All', ...Object.keys(RAW_QUESTIONS[state.gradeKey].categories)];
+    categoryChips = cats.map(c => `
+      <button class="chip ${state.categoryKey === c ? 'chip-active' : ''}" data-category="${c}">${c}</button>
+    `).join('');
+  }
+
+  let lengthChips = '';
+  if (state.mode === 'classic') {
+    lengthChips = [10, 15, 20].map(n => `
+      <button class="chip ${state.roundLength === n ? 'chip-active' : ''}" data-length="${n}">${n} Qs</button>
+    `).join('');
+  }
+
+  el.innerHTML = `
+    <button class="back-btn" id="btn-back-home">&larr; Back</button>
+    <h2 class="screen-title">${modeLabel}</h2>
+    <p class="screen-desc">${modeDesc}</p>
+
+    <h3 class="section-label">Choose a grade level</h3>
+    <div class="chip-row">${gradeChips}</div>
+
+    ${state.gradeKey ? `
+      <h3 class="section-label">Category</h3>
+      <div class="chip-row">${categoryChips}</div>
+    ` : ''}
+
+    ${lengthChips ? `
+      <h3 class="section-label">Round length</h3>
+      <div class="chip-row">${lengthChips}</div>
+    ` : ''}
+
+    <button class="btn-primary btn-start" id="btn-start" ${!state.gradeKey ? 'disabled' : ''}>
+      Start ${modeLabel}
+    </button>
+  `;
+}
+
+function renderGame() {
+  const el = $('#screen-game');
+  el.classList.add('active');
+  const q = state.pool[state.index];
+  if (!q) return;
+
+  const progress = state.mode === 'classic'
+    ? `Question ${state.index + 1} / ${state.pool.length}`
+    : `Streak: ${state.streak} 🔥`;
+
+  const optionsHtml = q.options.map((opt, i) => {
+    let cls = 'option-btn';
+    if (state.answered) {
+      if (i === q.answer) cls += ' correct';
+      else if (i === state.selected) cls += ' incorrect';
+      else cls += ' dim';
+    }
+    return `<button class="${cls}" data-option="${i}" ${state.answered ? 'disabled' : ''}>
+      <span class="opt-letter">${'ABCD'[i]}</span><span class="opt-text">${opt}</span>
+    </button>`;
+  }).join('');
+
+  const feedback = state.answered
+    ? (state.selected === q.answer
+        ? `<p class="feedback correct-text">Correct! 🎉</p>`
+        : `<p class="feedback incorrect-text">Not quite \u2014 the answer is "${q.options[q.answer]}"</p>`)
+    : '';
+
+  const nextLabel = state.mode === 'classic'
+    ? (state.index + 1 >= state.pool.length ? 'See Results' : 'Next Question')
+    : (state.answered && state.selected !== q.answer ? 'See Results' : 'Next Question');
+
+  el.innerHTML = `
+    <div class="game-topbar">
+      <span class="progress-label">${progress}</span>
+      <button class="quit-btn" id="btn-quit">&times;</button>
+    </div>
+    ${state.mode === 'classic' ? `<div class="score-pill">Score: ${state.score}</div>` : ''}
+    <div class="question-card">
+      <span class="cat-tag">${q.category}</span>
+      <h2 class="question-text">${q.q}</h2>
+    </div>
+    <div class="options-grid">${optionsHtml}</div>
+    ${feedback}
+    ${state.answered ? `<button class="btn-primary" id="btn-next">${nextLabel}</button>` : ''}
+  `;
+}
+
+function renderReveal() {
+  const el = $('#screen-reveal');
+  el.classList.add('active');
+  const q = state.pool[state.index];
+  if (!q) return;
+
+  const optionsHtml = q.options.map((opt, i) => {
+    let cls = 'option-btn reveal-option';
+    if (state.revealed && i === q.answer) cls += ' correct';
+    return `<div class="${cls}"><span class="opt-letter">${'ABCD'[i]}</span><span class="opt-text">${opt}</span>${state.revealed && i === q.answer ? ' <span class="check">\u2713</span>' : ''}</div>`;
+  }).join('');
+
+  const playersHtml = state.players.map((p, i) => `
+    <div class="player-row">
+      <input class="player-name" data-player-idx="${i}" value="${p.name}" />
+      <button class="pts-btn minus" data-pts="-1" data-idx="${i}">\u2212</button>
+      <span class="pts-value">${p.pts}</span>
+      <button class="pts-btn plus" data-pts="1" data-idx="${i}">+</button>
+    </div>
+  `).join('');
+
+  el.innerHTML = `
+    <div class="game-topbar">
+      <span class="progress-label">Card ${state.index + 1} / ${state.pool.length}</span>
+      <button class="quit-btn" id="btn-quit">&times;</button>
+    </div>
+    <div class="question-card">
+      <span class="cat-tag">${q.category}</span>
+      <h2 class="question-text">${q.q}</h2>
+    </div>
+    <div class="options-grid">${optionsHtml}</div>
+
+    ${!state.revealed
+      ? `<button class="btn-primary" id="btn-reveal">Reveal Answer</button>`
+      : `<div class="reveal-nav">
+           <button class="btn-secondary" id="btn-prev">&larr; Prev</button>
+           <button class="btn-primary" id="btn-reveal-next">Next Card &rarr;</button>
+         </div>`
+    }
+
+    <div class="scoreboard">
+      <div class="scoreboard-head">
+        <h3>Scoreboard</h3>
+        <div class="scoreboard-controls">
+          <button class="mini-btn" id="btn-add-player">+ Player</button>
+          <button class="mini-btn" id="btn-remove-player">\u2212 Player</button>
+          <button class="mini-btn" id="btn-reset-scores">Reset</button>
+        </div>
+      </div>
+      <div class="players-list">${playersHtml}</div>
+    </div>
+  `;
+}
+
+function renderResults() {
+  const el = $('#screen-results');
+  el.classList.add('active');
+
+  if (state.mode === 'classic') {
+    const pct = Math.round((state.score / state.pool.length) * 100);
+    let msg = 'Nice effort \u2014 keep practicing!';
+    if (pct === 100) msg = 'Perfect score! Incredible! 🌟';
+    else if (pct >= 80) msg = 'Awesome job! 🎉';
+    else if (pct >= 50) msg = 'Good work! Keep it up. 💪';
+    el.innerHTML = `
+      <h2 class="screen-title">Quiz Complete!</h2>
+      <div class="results-score">${state.score} / ${state.pool.length}</div>
+      <p class="results-pct">${pct}% correct</p>
+      <p class="results-msg">${msg}</p>
+      <div class="results-actions">
+        <button class="btn-primary" id="btn-play-again">Play Again</button>
+        <button class="btn-secondary" id="btn-change-settings">Change Settings</button>
+        <button class="btn-ghost" id="btn-home">Home</button>
+      </div>
+    `;
+  } else if (state.mode === 'streak') {
+    const isNewBest = state.streak > 0 && state.streak === state.bestStreak;
+    el.innerHTML = `
+      <h2 class="screen-title">Streak Ended</h2>
+      <div class="results-score">${state.streak} 🔥</div>
+      <p class="results-pct">${isNewBest ? 'New personal best!' : 'Best streak: ' + state.bestStreak}</p>
+      <p class="results-msg">${state.streak >= 10 ? 'Outstanding streak!' : state.streak >= 5 ? 'Great run!' : 'Keep going for a longer streak!'}</p>
+      <div class="results-actions">
+        <button class="btn-primary" id="btn-play-again">Play Again</button>
+        <button class="btn-secondary" id="btn-change-settings">Change Settings</button>
+        <button class="btn-ghost" id="btn-home">Home</button>
+      </div>
+    `;
+  }
+}
+
+/* ============ EVENTS (delegated) ============ */
+function wireEvents() {
+  document.body.addEventListener('click', (e) => {
+    const themeDot = e.target.closest('.theme-dot');
+    if (themeDot) { applyTheme(themeDot.dataset.themeId); return; }
+
+    const modeCard = e.target.closest('.mode-card');
+    if (modeCard) { openSetup(modeCard.dataset.mode); return; }
+
+    if (e.target.closest('#btn-back-home')) { goHome(); return; }
+
+    const gradeChip = e.target.closest('[data-grade]');
+    if (gradeChip) { state.gradeKey = gradeChip.dataset.grade; state.categoryKey = 'All'; render(); return; }
+
+    const catChip = e.target.closest('[data-category]');
+    if (catChip) { state.categoryKey = catChip.dataset.category; render(); return; }
+
+    const lenChip = e.target.closest('[data-length]');
+    if (lenChip) { state.roundLength = parseInt(lenChip.dataset.length, 10); render(); return; }
+
+    if (e.target.closest('#btn-start')) { startGame(); return; }
+
+    const optBtn = e.target.closest('.option-btn:not(.reveal-option)');
+    if (optBtn && !optBtn.disabled) { selectAnswer(parseInt(optBtn.dataset.option, 10)); return; }
+
+    if (e.target.closest('#btn-next')) { nextQuestion(); return; }
+    if (e.target.closest('#btn-quit')) { quitToHome(); return; }
+
+    if (e.target.closest('#btn-reveal')) { revealAnswer(); return; }
+    if (e.target.closest('#btn-reveal-next')) { revealNext(); return; }
+    if (e.target.closest('#btn-prev')) { revealPrev(); return; }
+    if (e.target.closest('#btn-add-player')) { addPlayer(); return; }
+    if (e.target.closest('#btn-remove-player')) { removePlayer(); return; }
+    if (e.target.closest('#btn-reset-scores')) { resetScores(); return; }
+
+    const ptsBtn = e.target.closest('.pts-btn');
+    if (ptsBtn) { bumpScore(parseInt(ptsBtn.dataset.idx, 10), parseInt(ptsBtn.dataset.pts, 10)); return; }
+
+    if (e.target.closest('#btn-play-again')) { startGame(); return; }
+    if (e.target.closest('#btn-change-settings')) { state.screen = 'setup'; render(); return; }
+    if (e.target.closest('#btn-home')) { goHome(); return; }
+  });
+
+  document.body.addEventListener('input', (e) => {
+    if (e.target.classList.contains('player-name')) {
+      renamePlayer(parseInt(e.target.dataset.playerIdx, 10), e.target.value);
+    }
+  });
+}
+
+/* ============ INIT ============ */
+async function init() {
+  wireEvents();
+  renderThemeBar();
+  document.documentElement.setAttribute('data-theme', state.theme);
+  renderParticles();
+  await loadBestStreak();
+  render();
+  window.addEventListener('resize', () => {}, { passive: true });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+</script>
+</body>
+</html>
